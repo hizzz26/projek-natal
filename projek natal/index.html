@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>QR Code & Ayat Alkitab - Gereja</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display&family=Poppins:wght@400;700&display=swap');
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: #f5f7fa;
+    color: #2c3e50;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    text-align: center;
+  }
+
+  /* Common container for both views */
+  #container {
+    max-width: 480px;
+    width: 100%;
+    background: white;
+    padding: 2rem 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+  }
+
+  /* QR Code Page */
+  #qr-page h1 {
+    font-weight: 700;
+    font-size: 2.8rem;
+    margin-bottom: 0.5rem;
+    color: #34495e;
+  }
+  #qr-page p {
+    font-size: 1.15rem;
+    margin-top: 0;
+    margin-bottom: 2rem;
+    color: #7f8c8d;
+  }
+  #qrcode {
+    margin: 0 auto;
+    width: 320px;
+    height: 320px;
+    background: white;
+    padding: 1.2rem;
+    border-radius: 24px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Verse Page */
+  #verse-page {
+    font-family: 'Playfair Display', serif;
+    padding: 1rem 1.5rem;
+  }
+  #verse-page h2 {
+    font-style: italic;
+    font-weight: 700;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+  }
+  #verse-page p.verse-text {
+    font-size: 1.4rem;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    color: var(--theme-color, #34495e);
+  }
+  #verse-page p.reference {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #7f8c8d;
+    margin-top: 0;
+  }
+
+  /* Thematic decorations for themes */
+  .theme-peace {
+    --theme-color: #2980b9; /* blue */
+    background: linear-gradient(135deg, #d9e6f6, #bbe1fa);
+    box-shadow: 0 8px 24px #a2c8f7;
+  }
+  .theme-love {
+    --theme-color: #c0392b; /* red */
+    background: linear-gradient(135deg, #f9d6d5, #f5b0a8);
+    box-shadow: 0 8px 24px #e57373;
+  }
+  .theme-strength {
+    --theme-color: #27ae60; /* green */
+    background: linear-gradient(135deg, #d3f8d3, #a8e6a3);
+    box-shadow: 0 8px 24px #81c784;
+  }
+  .theme-hope {
+    --theme-color: #f39c12; /* orange */
+    background: linear-gradient(135deg, #fcf3d9, #f9ddb1);
+    box-shadow: 0 8px 24px #f6c85f;
+  }
+  .theme-faith {
+    --theme-color: #8e44ad; /* purple */
+    background: linear-gradient(135deg, #e6d1f2, #cca0e9);
+    box-shadow: 0 8px 24px #af7ad9;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 3rem;
+    font-size: 0.9rem;
+    color: #95a5a6;
+  }
+
+  /* Responsive */
+  @media (max-width: 400px) {
+    #container {
+      padding: 1.5rem 1.5rem;
+    }
+    #qrcode {
+      width: 280px;
+      height: 280px;
+    }
+  }
+</style>
+</head>
+<body>
+<div id="container"></div>
+
+<footer>
+  &copy; 2024 Gereja XYZ - Semua Hak Dilindungi
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<script>
+  // Bible verses with themes and references
+  const verses = [
+    {
+      text: "Damai Kutinggalkan kepadamu; damai-Ku Kuberikan kepadamu. Janganlah gelisah dan gentar hatimu.",
+      reference: "Yohanes 14:27",
+      theme: "peace"
+    },
+    {
+      text: "Kasih itu sabar, kasih itu murah hati, ia tidak cemburu. Ia tidak memegahkan diri dan tidak sombong.",
+      reference: "1 Korintus 13:4",
+      theme: "love"
+    },
+    {
+      text: "Segala perkara dapat kutanggung di dalam Dia yang memberi kekuatan kepadaku.",
+      reference: "Filipi 4:13",
+      theme: "strength"
+    },
+    {
+      text: "Sebab Aku ini mengetahui rancangan-rancangan apa yang ada pada-Ku mengenai kamu, demikianlah firman TUHAN, yaitu rancangan damai sejahtera dan bukan rancangan kecelakaan, untuk memberikan kepadamu hari depan yang penuh harapan.",
+      reference: "Yeremia 29:11",
+      theme: "hope"
+    },
+    {
+      text: "Iman adalah dasar dari segala sesuatu yang kita harapkan dan bukti dari segala sesuatu yang tidak kita lihat.",
+      reference: "Ibrani 11:1",
+      theme: "faith"
+    }
+  ];
+
+  // Helper to get URL parameter
+  function getURLParameter(name) {
+    return new URLSearchParams(window.location.search).get(name);
+  }
+
+  // Render QR Code Page
+  function renderQRPage() {
+    const container = document.getElementById('container');
+    container.className = '';
+    container.innerHTML = `
+      <div id="qr-page">
+        <h1>Scan QR Code Ini</h1>
+        <p>Untuk mendapatkan satu ayat Alkitab yang menyentuh hati</p>
+        <div id="qrcode"></div>
+      </div>
+    `;
+    const qrCodeContainer = document.getElementById('qrcode');
+
+    // Clear previous QR code content if any
+    qrCodeContainer.innerHTML = '';
+
+    // Create canvas element where QR code will be drawn
+    const canvas = document.createElement('canvas');
+    qrCodeContainer.appendChild(canvas);
+
+    // Construct QR code data: same page URL with random verse index
+    const randIndex = Math.floor(Math.random() * verses.length);
+    const urlToEncode = window.location.origin + window.location.pathname + '?verse=' + randIndex;
+
+    QRCode.toCanvas(canvas, urlToEncode, {
+      width: 300,
+      margin: 1,
+      color: {
+        dark: "#2c3e50",
+        light: "#ffffff"
+      }
+    }, function (error) {
+      if (error) console.error(error);
+      else console.log("QR Code generated:", urlToEncode);
+    });
+  }
+
+  // Render Verse Page
+  function renderVersePage(verseIndex) {
+    const verse = verses[verseIndex];
+    if (!verse) {
+      // If invalid index, fallback to QR page
+      renderQRPage();
+      return;
+    }
+    const container = document.getElementById('container');
+    container.className = `theme-${verse.theme}`;
+    container.innerHTML = `
+      <div id="verse-page">
+        <h2>Ayat Alkitab Hari Ini</h2>
+        <p class="verse-text">"${verse.text}"</p>
+        <p class="reference">- ${verse.reference}</p>
+      </div>
+    `;
+  }
+
+  // Main logic
+  const verseParam = getURLParameter('verse');
+  if (verseParam !== null) {
+    const index = parseInt(verseParam, 10);
+    renderVersePage(index);
+  } else {
+    renderQRPage();
+  }
+</script>
+</body>
+</html>
+
